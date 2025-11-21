@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Import Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6dd5ed, #2193b0);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Glass Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Glow Animation */
+        .glow {
+            animation: glowEffect 2s infinite alternate;
+        }
+
+        @keyframes glowEffect {
+            0% { box-shadow: 0 0 10px rgba(255,255,255,0.4); }
+            100% { box-shadow: 0 0 25px rgba(255,255,255,0.7); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glass p-8 rounded-3xl shadow-2xl max-w-lg w-full text-center glow">
+
+        <h1 class="text-4xl font-bold text-white drop-shadow-md mb-6">
+            🌦️ Weather Detector
+        </h1>
+
+        <!-- Search Section -->
+        <div class="mb-6 flex flex-col sm:flex-row gap-4">
+            <input type="text" id="cityInput" placeholder="🔍 Enter city name..."
+                class="flex-grow p-3 rounded-xl bg-white shadow-md outline-none focus:ring-2 focus:ring-blue-500">
+
+            <button id="searchBtn"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition">
+                🔎 Search
+            </button>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="hidden text-white font-medium mb-4 text-lg">
+            ⏳ Fetching weather...
+        </div>
+
+        <!-- Error Box -->
+        <div id="error" class="hidden text-red-700 font-semibold mt-6 bg-red-200 p-4 rounded-lg border border-red-400">
+            <!-- Error here -->
+        </div>
+
+        <!-- Weather Info -->
+        <div id="weatherInfo" class="hidden">
+
+            <h2 id="cityName" class="text-3xl font-bold text-white mb-2"></h2>
+
+            <p id="temperature" class="text-7xl font-bold text-yellow-300 drop-shadow-md mb-4"></p>
+
+            <p id="description" class="text-2xl text-white capitalize mb-4"></p>
+
+            <div class="grid grid-cols-2 gap-4 text-lg">
+
+                <div class="bg-white bg-opacity-80 p-4 rounded-xl shadow-lg">
+                    💧 <span class="font-semibold">Humidity:</span>
+                    <span id="humidity"></span>
+                </div>
+
+                <div class="bg-white bg-opacity-80 p-4 rounded-xl shadow-lg">
+                    🌬️ <span class="font-semibold">Wind:</span>
+                    <span id="windSpeed"></span> m/s
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get elements
+        const cityInput = document.getElementById('cityInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const weatherInfoDiv = document.getElementById('weatherInfo');
+        const cityNameSpan = document.getElementById('cityName');
+        const temperatureSpan = document.getElementById('temperature');
+        const descriptionSpan = document.getElementById('description');
+        const humiditySpan = document.getElementById('humidity');
+        const windSpeedSpan = document.getElementById('windSpeed');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+
+        // API Key
+        const API_KEY = "1bdd7035c0ba1b9745164f6e007811ed";
+
+        // Fetch Weather Function
+        async function fetchWeatherData() {
+            const city = cityInput.value.trim();
+
+            errorDiv.classList.add('hidden');
+            weatherInfoDiv.classList.add('hidden');
+            loadingDiv.classList.remove('hidden');
+
+            if (!city) {
+                loadingDiv.classList.add('hidden');
+                errorDiv.textContent = "🚫 Please enter a city!";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (response.ok) {
+                    cityNameSpan.textContent = `📍 ${data.name}`;
+                    temperatureSpan.textContent = `${Math.round(data.main.temp)}°C`;
+                    descriptionSpan.textContent = `🌤️ ${data.weather[0].description}`;
+                    humiditySpan.textContent = `${data.main.humidity}%`;
+                    windSpeedSpan.textContent = data.wind.speed;
+
+                    weatherInfoDiv.classList.remove('hidden');
+
+                } else {
+                    errorDiv.textContent = `⚠️ ${data.message}`;
+                    errorDiv.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                errorDiv.textContent = "❌ Network error. Check your connection.";
+                errorDiv.classList.remove('hidden');
+
+            } finally {
+                loadingDiv.classList.add('hidden');
+            }
+        }
+
+        // Click event
+        searchBtn.addEventListener('click', fetchWeatherData);
+
+        // Enter key event
+        cityInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                fetchWeatherData();
+            }
+        });
+    </script>
+
+</body>
+</html>
