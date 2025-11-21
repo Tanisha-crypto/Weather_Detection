@@ -1,4 +1,4 @@
-# 🌤️ SkySense – Weather Forecast App
+# 🌤️ SkySense – Weather Detection App
 
 SkySense is a clean, modern, and responsive **Weather Forecast Web App** that shows real-time temperature, weather condition, humidity, and wind speed.  
 Powered by **OpenWeatherMap API**, it provides accurate data with a beautiful and intuitive UI.
@@ -47,3 +47,4 @@ Before running the project, you need a free API key.
 
 ```js
 const API_KEY = "1bdd7035c0ba1b9745164f6e007811ed";
+
